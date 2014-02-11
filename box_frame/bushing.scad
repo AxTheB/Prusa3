@@ -14,7 +14,6 @@ function adjust_bushing_len(conf_b, h, add=layer_height*2) = ((conf_b[2]+add) > 
 //distance from the flat side of bushing holder to rod center
 function bushing_foot_len(conf_b, h=10.5, add=4*single_wall_width) = ((conf_b[1]+add) > h) ? conf_b[1]+add : h;
 
-function bushing_outer_radius(conf_b) = conf_b[1] + 4*single_wall_width;
 
 // basic building blocks, housings for 1 bushing/bearing
 // at [0,0] there is center of the smooth rod, pointing in Z
@@ -47,12 +46,14 @@ module linear_bushing_negative(conf_b=bushing_xy, h=0){
 }
 
 module linear_bearing_negative(conf_b = bushing_xy, h = 0, shadow=false){
+        delta = (adjust_bushing_len(conf_b, h) - adjust_bushing_len(conf_b, conf_b[2])) / 2;
     //same as linear_bushing_negative, but with z direction constrained parts
     translate([0,0,-0.1]) cylinder(r = conf_b[0] + single_wall_width, h=adjust_bushing_len(conf_b, h, 8*layer_height)+0.2);
-    //lower bearing
-    linear_bearing_negative_single(conf_b, 0, shadow);
-    if (h > 2*conf_b[2] + 9*layer_height){
-        translate([0,0,h]) mirror([0,0,1]) linear_bearing_negative_single(conf_b, 0, shadow);
+    if (h > 2*conf_b[2] + 9*layer_height){ // two short bearings, far from each other
+        linear_bearing_negative_single(conf_b, 0, shadow);
+        translate([0, 0, h]) mirror([0, 0, 1]) linear_bearing_negative_single(conf_b, 0, shadow);
+    } else {
+        translate([0, 0, max(0, (h - conf_b[2] - 6 * layer_height) / 2)]) linear_bearing_negative_single(conf_b, 0, shadow);
     }
 }
 
@@ -87,27 +88,28 @@ module linear_bushing(conf_b=bushing_xy, h=0){
     }
 }
 
-module linear_bearing(conf_b=bushing_xy, h=0){
+module linear_bearing(conf_b=bushing_xy, h=0, clamp = true){
     difference() {
         union() {
             difference(){
                 union(){
                     //main block
-                    //translate([-bushing_foot_len(conf_b), -7, 0]) cube([4, 14, adjust_bushing_len(conf_b, h, 9*layer_height)]);   <- removed for duplicity:)
                     translate([0,0,0]) cylinder(h = adjust_bushing_len(conf_b, h, 9*layer_height), r=bushing_outer_radius(conf_b), $fn=60);
                 }
                 //smooth entry cut
                 translate([12,0,-1]) rotate([0,0,45]) cube([20, 20, 200], center=true);
             }
-            intersection(){
-                translate([0, -(bushing_outer_radius(conf_b)), 0]) cube([30, 2*bushing_outer_radius(conf_b) , max(h, conf_b[2] + 9 * layer_height)]);
-                union() {
-                    // upper clamp for long holders
-                    if (h > 2*conf_b[2] + 9*layer_height || conf_b[2] > 45){
-                        translate ([0,0, max(h, conf_b[2]) - 8 ]) bearing_clamp(conf_b, 2*(bushing_outer_radius(conf_b)));
+            if (clamp) {
+                intersection(){
+                    translate([0, -(bushing_outer_radius(conf_b)), 0]) cube([30, 2*bushing_outer_radius(conf_b) , max(h, conf_b[2] + 9 * layer_height)]);
+                    union() {
+                        // upper clamp for long holders
+                        if (h > 2*conf_b[2] + 9*layer_height || conf_b[2] > 45){
+                            translate ([0,0, max(h, conf_b[2]) - 8 ]) bearing_clamp(conf_b, 2*(bushing_outer_radius(conf_b)));
+                        }
+                        //lower clamp
+                        translate ([0, 0, 10]) bearing_clamp(conf_b, 2*(bushing_outer_radius(conf_b)));
                     }
-                    //lower clamp
-                    translate ([0, 0, 10]) bearing_clamp(conf_b, 2*(bushing_outer_radius(conf_b)));
                 }
             }
         }
@@ -146,7 +148,7 @@ module y_bearing(conf_b=bushing_xy){
                 }
                 linear_negative_preclean();
             }
-            linear();
+            linear(h = bushing_xy[2] + 1);
         }
         //linear_negative(bushing_xy, 20);
     }
@@ -188,10 +190,10 @@ module linear_negative(conf_b = bushing_xy, h = 0, shadow=false){
     }
 }
 
-module linear(conf_b = bushing_xy, h = 0){
+module linear(conf_b = bushing_xy, h = 0, clamp = true){
     //selects right model based on type
     if (conf_b[3] == 0) {
-        linear_bearing(conf_b, h);
+        linear_bearing(conf_b, h, clamp);
     } else {
         linear_bushing(conf_b, h);
     }
@@ -199,7 +201,7 @@ module linear(conf_b = bushing_xy, h = 0){
 }
 
 if (i_am_box == 1) {
-    %cylinder(r=bushing_xy[0], h=90);
+    //%cylinder(r=bushing_xy[0], h=90);
 
     y_bearing();
     translate([0,52,0]) y_bearing();
@@ -210,3 +212,5 @@ if (i_am_box == 1) {
 } else {
     cube([0.1, 0.1, 0.1]);
 }
+
+

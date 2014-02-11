@@ -172,3 +172,16 @@ module maketeeth(len){
         translate([0, 0, i * belt_tooth_distance]) cube([2, 9, belt_tooth_distance * belt_tooth_ratio], center = true);
     }
 }
+
+
+module cylinder_pushfit(r,h, center=false){
+    //horizontal smooth hole opening
+    trn = (center ? 0 : h/2);
+    translate([0, 0, trn]) {
+        cylinder(h=h, r=r, $fn=30, center=true);
+        translate([0, -r / 2, 0]) cube_fillet([r * 2, r, h], vertical = [0, 0, 1.5, 1.5], center = true, $fn=4);
+        translate([0, -r - 4 * layer_height, 0]) cube([r * 2 - 2, 1, h], center = true);
+    }
+}
+
+function bushing_outer_radius(conf_b) = conf_b[1] + 4*single_wall_width;

@@ -20,33 +20,40 @@ carriage_l_adjusted = max(adjust_bushing_len(bushing_xy, carriage_l_base, layer_
 carriage_l_real = max((bushing_xy[2] > 30 ? carriage_l_adjusted : (2 * bushing_xy[2] + 6)), carriage_l_adjusted);
 // if the carriage was extended, we want to increase carriage_hole_to_side
 carriage_hole_to_side = max(3, ((carriage_l_real - carriage_l_base) / 2));
-echo(carriage_hole_to_side);
+// echo(carriage_hole_to_side);
 carriage_l = carriage_l_base + 2 * carriage_hole_to_side;
 
+echo(carriage_l_real);
+echo(carriage_l_adjusted);
+echo(carriage_l);
+echo(bushing_carriage[2]);
+echo(bushing_xy[2]);
 
-bushing_carriage_len = adjust_bushing_len(bushing_carriage, 21, layer_height * 9);
+module extruder_mounting_screwhole(){
+    rotate([90, 0, 0]) cylinder(r=1.8, h=32, center=true,$fn=small_hole_segments);
+    translate([0, 7, 0]) rotate([90, 60, 0]) cylinder(r=3.4, h=5, $fn=6, center=true);
+}
 
 module x_carriage(){
     mirror([1,0,0]) {
         difference() {
             union() {
                 //upper bearing
-                rotate([0, 0, 90]) linear(bushing_carriage);
+                rotate([0, 0, 180]) linear(bushing_carriage, bushing_carriage[2], false);
                 //lower bearing
-                translate([xaxis_rod_distance,0,0]) rotate([0, 0, 90]) linear(bushing_xy, carriage_l);
+                translate([xaxis_rod_distance,0,0]) rotate([0, 0, 0]) linear(bushing_xy, carriage_l, false);
 
                 //This block moves with varying bearing thickness to ensure the front side is flat
                 translate([0, -bushing_foot_len(bushing_xy), 0]) {
                     // main plate
-                    translate([4, -1, 0]) cube_fillet([xaxis_rod_distance + 4, 6, carriage_l], radius=2);
-                    translate([-8, -1, 0]) cube_fillet([xaxis_rod_distance + 16, 6, bushing_carriage_len + 3], radius=2);
+                    translate([bushing_carriage[1] - 1, 0, 0]) cube_fillet([xaxis_rod_distance - 2 * bushing_carriage[1] + 2, 7, carriage_l], radius=2);
                 }
 
                 translate([45/2,0,0]){
 
                     //fill the space where the belt is, as it will be substracted at later point and we want it stiff here.
                     //belt smooth side
-                    translate([-13.5 - belt_thickness, -8.5, 0]) cube_fillet([5, 15, carriage_l], vertical = [2, 2, 0, 0]);
+                    translate([-13.5 - belt_thickness, -10.5, 0]) cube_fillet([5, 20, carriage_l], vertical = [2, 2, 2, 0]);
                     //belt teethed side, with cutouts for belt ends.
                     difference(){
                         union() {
@@ -65,32 +72,28 @@ module x_carriage(){
                 }
             }
             //Ensure upper bearing can be inserted cleanly
-            rotate([0, 0, 90]) {
-                linear_negative(bushing_carriage, carriage_l);
+            rotate([0, 0, 180]) {
+                linear_negative(bushing_carriage, bushing_carriage[2]);
             }
             //Same for lower bearing
-            translate([xaxis_rod_distance, 0, 0]) rotate([0, 0, 90]) {
-                linear_negative(bushing_xy, carriage_l);
+            translate([xaxis_rod_distance, 0, 0]) {
+                //linear_negative(bushing_xy, bushing_xy[2]);
             }
             // extruder mounts
             translate([20, -2, carriage_hole_to_side]) {
-                rotate([90, 0, 0]) cylinder(r=1.8, h=32, center=true,$fn=small_hole_segments);
-                translate([0, 7, 0]) rotate([90, 60, 0]) cylinder(r=3.4, h=5, $fn=6, center=true);
+                extruder_mounting_screwhole();
             }
             translate([20, -2, carriage_hole_to_side + 30]) {
-                rotate([90, 0, 0]) cylinder(r=1.8, h=32, center=true,$fn=small_hole_segments);
-                translate([0, 7, 0]) rotate([90, 60, 0]) cylinder(r=3.4, h=5, $fn=6, center=true);
+                extruder_mounting_screwhole();
             }
             if (carriage_l >= 50 + 2 * carriage_hole_to_side) {
                 translate([20, -2, carriage_hole_to_side + 30 + 20]) {
-                    rotate([90, 0, 0]) cylinder(r=1.8, h=32, center=true,$fn=small_hole_segments);
-                    translate([0, 7, 0]) rotate([90, 60, 0]) cylinder(r=3.4, h=5, $fn=6, center=true);
+                    extruder_mounting_screwhole();
                 }
             }
             if (carriage_l >= 80 + 2 * carriage_hole_to_side) {
                 translate([20, -2, carriage_hole_to_side + 30 + 20 + 30]) {
-                    rotate([90, 0, 0]) cylinder(r=1.8, h=32, center=true,$fn=small_hole_segments);
-                    translate([0, 7, 0]) rotate([90, 60, 0]) cylinder(r=3.4, h=5, $fn=6, center=true);
+                    extruder_mounting_screwhole();
                 }
             }
             //belt insert

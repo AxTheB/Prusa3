@@ -8,23 +8,28 @@
 
 include <configuration.scad>
 
+board_to_z_distance = max(board_to_x_distance + x_to_z_distance, 27);
+board_to_threaded_z_distance = max(board_to_x_distance + x_box_width / 2 + 6, 27);
+
+echo(board_to_z_distance);
+echo(board_to_threaded_z_distance);
+
 module zmotorholder(thickness=(i_am_box == 0 ? 38 : 23), bottom_thickness=5){
     difference(){
         union(){
             // Motor holding part
             difference(){
                 union(){
-                    zrodholder(thickness=thickness, xlen=45, ylen=44, zdelta=((i_want_to_use_single_plate_dxf_and_make_my_z_weaker == 0) ? 0 : 5));
-                    translate([board_to_xz_distance, board_to_xz_distance, 0]) {
+                    zrodholder(thickness=thickness, xlen=board_to_threaded_z_distance + 19, ylen=44, zdelta=((i_want_to_use_single_plate_dxf_and_make_my_z_weaker == 0) ? 0 : 5));
+                    #translate([board_to_threaded_z_distance, 26, 0]) {
                         nema17(places=[0, 1, 1, 1], h=bottom_thickness + layer_height, $fn=23, shadow=layer_height + 2);
                     }
                 }
 
                 // motor screw holes
-                translate([board_to_xz_distance, board_to_xz_distance, thickness]) {
+                translate([board_to_threaded_z_distance, 26, thickness]) {
                     mirror([0, 0, 1]) translate([0, 0, thickness-8])
                         nema17(places=[0, 1, 1, 1], holes=true, h=bottom_thickness + 1, $fn=small_hole_segments);
-                        //shadow=-6 + layer_height);
                 }
             }
         }
@@ -32,7 +37,7 @@ module zmotorholder(thickness=(i_am_box == 0 ? 38 : 23), bottom_thickness=5){
 }
 
 
-module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=44, xlen=34, zdelta=0){
+module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=44, xlen=board_to_threaded_z_distance + 8, zdelta=0){
     holder_inner_r = 9;
     holder_inner_r2 = 2;
     difference(){
@@ -40,11 +45,11 @@ module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=
             difference(){
                 union(){
                     //piece along the flat side of a board
-                    cube_fillet([14, ylen, bottom_thickness], vertical=[8, 3, 0, 0]);
+                    cube_fillet([board_to_threaded_z_distance - 12, ylen, bottom_thickness], vertical=[8, 3, 0, 0]);
                     cube_fillet([5, ylen, thickness], vertical=[3, 3, 0, 0], top = [thickness / 1.7, 0, 0, 5]);
                     //hole for Z axis is thru this
                     cube_fillet([xlen, 14, bottom_thickness], vertical=[3, 0, 0, 3]);
-                    translate([14, 14, 0]) {
+                    translate([board_to_threaded_z_distance - 12, 14, 0]) {
                         //large fillet that makes it stiffer by lot. Thanks to Marcus Wolschon
                         difference(){
                             cube([holder_inner_r, holder_inner_r, bottom_thickness]);
@@ -53,6 +58,7 @@ module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=
                         }
                     }
                     translate([5, 5, 0]) {
+                        //inner fillet
                         difference(){
                             cube([holder_inner_r2, holder_inner_r2, thickness - 5.5]);
                             translate([holder_inner_r2, holder_inner_r2, -0.5])
@@ -62,17 +68,17 @@ module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=
                     //piece along cut side of the board
                     if (i_am_box == 1) {
                         translate([-board_thickness, 0, 0])
-                            cube_fillet([board_thickness + board_to_xz_distance + bushing_z[0], 5, thickness], radius=2, top = [0, 0, 0, thickness], $fn=99);
+                            cube_fillet([board_thickness + board_to_z_distance + bushing_z[0], 5, thickness], radius=2, top = [0, 0, 0, thickness], $fn=99);
                     } else {
                         translate([-board_thickness/2, 0, 0])
-                            cube_fillet([board_thickness/2 + board_to_xz_distance + bushing_z[0], 5, thickness], radius=2, top = [0, 0, 0, thickness], $fn=99);
+                            cube_fillet([board_thickness/2 + board_to_z_distance + bushing_z[0], 5, thickness], radius=2, top = [0, 0, 0, thickness], $fn=99);
                     }
                     //smooth rod insert
-                    translate([board_to_xz_distance - z_delta, 9, 0])
+                    translate([board_to_z_distance , 9, 0])
                         cylinder(h=bottom_thickness / 2, r=(bushing_z[0] + 5 * single_wall_width));
                 }
                 //smooth rod hole
-                translate([board_to_xz_distance - z_delta, 9, -1]) cylinder(h=board_thickness+20, r=bushing_z[0] + single_wall_width / 4);
+                translate([board_to_z_distance, 9, -1]) cylinder(h=board_thickness+20, r=bushing_z[0] + single_wall_width / 4);
                 //inside rouned corner
                 translate([0, 5, -1]) cylinder(r=0.8, h=100, $fn=8);
                 //side screw
@@ -101,7 +107,8 @@ module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=
         }
     }
 }
-translate([10, -50, 0]) zmotorholder();
-translate([0, 50, 0]) mirror([0, 1, 0]) zmotorholder();
-translate([67, 14, 0]) rotate([0,0,90]) zrodholder();
+translate([10 - z_delta, -50 - z_delta, 0]) zmotorholder();
+translate([0 - z_delta, 50 + z_delta, 0]) mirror([0, 1, 0]) zmotorholder();
+translate([67, 14, 0]) rotate([0,0,90]) 
+zrodholder();
 translate([77, -14, 0]) rotate([0, 0, -90]) mirror([0, 1, 0]) zrodholder();

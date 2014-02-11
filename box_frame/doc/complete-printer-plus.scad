@@ -342,12 +342,12 @@ x_smooth_rod_length=450+board_thickness*2+10;
 translate([-board_w/2+4+12-board_thickness,-26+12-board_thickness, 200+ x_axis_height])
 rotate([0,0,90])
 //rotate([0,180,0])
-render(convexity=4) mirror([0, 0, 1]) x_end_motor();
+render(convexity=4) mirror([1, 0, 0]) mirror([0, 0, 1]) x_end_motor();
 
 translate([board_w/2-4-12+board_thickness,-26+12-board_thickness, 200 + x_axis_height])
 rotate(90)
 //rotate([0,180,0])
-render(convexity=4) mirror([0, 0, 1]) x_end_idler();
+render(convexity=4) mirror([1, 0, 0]) mirror([0, 0, 1]) x_end_idler();
 
 // bearing guide
 translate([board_w/2-4-12+board_thickness-27,-26+12-board_thickness-9-(10-(7+0.9*2))/2,140 + x_axis_height+27])
@@ -482,7 +482,7 @@ module boxframe(top=false){
 
 
 translate([-25,312,0])rotate([0,0,-90])color([0,0,0,0.4])
-boxframe(true);
+boxframe();
 // floor
 //color([0.8,0.8,0.2,0.35])translate([0,0,-100])cube([800,800,200],true);
 //--------------------------------------------------------------------------------------------------------------------------------

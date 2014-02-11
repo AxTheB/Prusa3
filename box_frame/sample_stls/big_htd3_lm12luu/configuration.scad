@@ -70,7 +70,7 @@ bushing_carriage = conf_b_lm12uu;
 // Select idler bearing size **************************************************
 // bearing_* are in inc/conf_bushing.scad
 
-idler_bearing = bearing_623;
+idler_bearing = bearing_624;
 
 // Select carriage lenght ******************************************************
 // 30 for single carriage extruder (two holes with centers 30mm apart)

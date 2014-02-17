@@ -30,6 +30,7 @@ module nutrod(r=4.4){
 
 module leftfront(thru = false){
     y_end_plug=2;
+    ziptie_inner_rd=5;
     // translate so the rod is on x = 0
     translate([-11,-y_end_plug,0])
 
@@ -48,9 +49,17 @@ module leftfront(thru = false){
 
             if(thru==false){
                 //Leave space on part top thru which the rod is inserted, but not too big so it still snaps in
-                translate([11, 15 + y_end_plug, 48 + bushing_xy[0] * 0.75 + xy_delta]) cube([bushing_xy[0] * 2.05, 30, 4], center=true);
-                //Actual smoooth rod
-                translate([11, y_end_plug, 48 + xy_delta]) rotate([0, 90, 90]) cylinder(h = 270, r=bushing_xy[0]);
+                translate([11, y_end_plug, 48 + xy_delta]) {
+                    translate([0, 15 , bushing_xy[0] * 0.75]) cube([bushing_xy[0] * 2.05, 30, 5], center=true);
+                    //Actual smoooth rod
+                    rotate([0, 90, 90]) cylinder(h = 270, r=bushing_xy[0]);
+                    translate([0, 10, 0]) {
+                        difference(){
+                            rotate([0, 90, 90]) cylinder(r=ziptie_inner_rd + 3 + bushing_xy[0], h=3, center=true);
+                            rotate([0, 90, 90]) cylinder(r=ziptie_inner_rd + bushing_xy[0], h=4, center=true);
+                        }
+                    }
+                }
             }else{
                 translate([11, 17-5, 48 + 2.05 + xy_delta]) cube([8.2, 30, 4.1], center=true);
                 translate([11, -3, 48 + xy_delta]) rotate([0, 90, 90]) cylinder(h = 270, r=4.0);

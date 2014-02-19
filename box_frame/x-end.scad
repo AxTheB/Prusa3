@@ -18,6 +18,13 @@
  * @name X Axis Idler End
  * @category Printed
  */
+
+/**
+ * @id xIdlerTensioner
+ * @name X Axis Belt Tensioner
+ * @category Printed
+ */
+
  
 include <configuration.scad>
 use <bushing.scad>

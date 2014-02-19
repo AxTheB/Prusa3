@@ -16,6 +16,7 @@
  * @category Assemblies
  * @using xMotorEnd
  * @using xIdlerEnd
+ * @using xIdlerTensioner
  * @using xCarriage
  * @using NEMA17
  * @using belt

@@ -33,14 +33,14 @@ module zmotorholder(thickness=(i_am_box == 0 ? 38 : 23), bottom_thickness=5){
             // Motor holding part
             difference(){
                 union(){
-                    zrodholder(thickness=thickness, xlen=board_to_threaded_z_distance + 19, ylen=44, zdelta=((i_want_to_use_single_plate_dxf_and_make_my_z_weaker == 0) ? 0 : 5));
-                    #translate([board_to_threaded_z_distance, 26, 0]) {
+                    zrodholder(thickness=thickness, xlen=board_to_threaded_z_distance + 19, ylen=26 + z_pair_separation, zdelta=((i_want_to_use_single_plate_dxf_and_make_my_z_weaker == 0) ? 0 : 5));
+                    translate([board_to_threaded_z_distance, 8 + z_pair_separation, 0]) {
                         nema17(places=[0, 1, 1, 1], h=bottom_thickness + layer_height, $fn=23, shadow=layer_height + 2);
                     }
                 }
 
                 // motor screw holes
-                translate([board_to_threaded_z_distance, 26, thickness]) {
+                translate([board_to_threaded_z_distance, 8 + z_pair_separation, thickness]) {
                     mirror([0, 0, 1]) translate([0, 0, thickness-8])
                         nema17(places=[0, 1, 1, 1], holes=true, h=bottom_thickness + 1, $fn=small_hole_segments);
                 }
@@ -61,8 +61,8 @@ module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=
                     cube_fillet([board_to_threaded_z_distance - 12, ylen, bottom_thickness], vertical=[8, 3, 0, 0]);
                     cube_fillet([5, ylen, thickness], vertical=[3, 3, 0, 0], top = [thickness / 1.7, 0, 0, 5]);
                     //hole for Z axis is thru this
-                    cube_fillet([xlen, 14, bottom_thickness], vertical=[3, 0, 0, 3]);
-                    translate([board_to_threaded_z_distance - 12, 14, 0]) {
+                    cube_fillet([xlen, z_pair_separation - 4, bottom_thickness], vertical=[3, 0, 0, 3]);
+                    translate([board_to_threaded_z_distance - 12, z_pair_separation - 4, 0]) {
                         //large fillet that makes it stiffer by lot. Thanks to Marcus Wolschon
                         difference(){
                             cube([holder_inner_r, holder_inner_r, bottom_thickness]);
@@ -120,8 +120,9 @@ module zrodholder(thickness=(i_am_box == 0 ? 14 : 15), bottom_thickness=5, ylen=
         }
     }
 }
-translate([10 - z_delta, -50 - z_delta, 0]) zmotorholder();
-translate([0 - z_delta, 50 + z_delta, 0]) mirror([0, 1, 0]) zmotorholder();
+translate([17 - board_to_x_distance, -23 - board_to_z_distance, 0]) zmotorholder();
+translate([17 - board_to_x_distance, 23 + board_to_z_distance, 0]) zmotorholder();
+//translate([-1 - z_delta, 53 + z_delta * 2, 0]) mirror([0, 1, 0]) zmotorholder();
 translate([67, 14, 0]) rotate([0,0,90]) 
 zrodholder();
 translate([77, -14, 0]) rotate([0, 0, -90]) mirror([0, 1, 0]) zrodholder();

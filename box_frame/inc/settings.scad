@@ -19,8 +19,10 @@ z_pair_separation = max(bushing_outer_radius(bushing_z) + 8, 18);
 
 idler_width = max(belt_width, idler_bearing[1], 7) + 2.5 * idler_bearing[3];
 
+//Required clearence from X axis center to board wrt carriage
+carriage_thickness = max(bushing_outer_radius(bushing_xy), bushing_outer_radius(bushing_carriage));
 //move the XZ plane further away from board for bigger bearings
-board_to_x_distance = x_box_width / 2 + 2;
+board_to_x_distance = max(carriage_thickness, x_box_width / 2) + 2;
 
 m3_nut_diameter_bigger = ((m3_nut_diameter / 2) / cos (180 / 6)) * 2;
 idler_height=max(idler_bearing[0], 16);

@@ -166,8 +166,8 @@ motor_mount_thickness=9;
 large_wheel_translation=[50.5-(7.4444+32.0111+0.25),34,0];
 
 m8_clearance_hole=8.8;
-hole_for_608=22.3;
 608_diameter=22;
+hole_for_608=608_diameter + 0.3;
 
 block_top_right=[wade_block_width,wade_block_height];
 
@@ -178,7 +178,7 @@ hobbing_depth=2;
 echo ("filament_feed_hole_d", filament_feed_hole_d);
 
 //This is the distance from the centre of the filament to the centre of the hobbed bolt.
-filament_feed_hole_offset=8/2-hobbing_depth+filament_diameter/2;
+filament_feed_hole_offset=m8_clearance_hole/2-hobbing_depth+filament_diameter/2;
 
 echo ("filament_feed_hole_offset", filament_feed_hole_offset);
 
@@ -370,7 +370,7 @@ echo("bhmh", mounting_holes)
 	}
 
 	//carriage mountig holes
-	#translate([-24.5+64+4,-0.5,3]) {
+	translate([-24.5+64+4,-0.5,3]) {
 		translate([-50,0,0]) {
 			translate([0,0,(wade_block_depth+base_extra_depth)/2+4+layer_thickness]) cylinder(r=m3_diameter/2, h=wade_block_depth+base_extra_depth, center=true);
 			translate([0, 0, 1]) cylinder(r=m3_washer_diameter/2, h=10.1, center=true);

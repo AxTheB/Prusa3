@@ -17,7 +17,7 @@
 include <../configuration.scad>
 use <inc/parametric_involute_gear_v5.0.scad>
 
-gear_distance = 40;
+gear_distance = 40.5;
 
 small();
 %translate([gear_distance, 0, 0]) rotate([0, 180, 92]) big(); //this should touch, teeth should mesh
@@ -29,6 +29,9 @@ teeth_big=49;
 teeth_twist=400;
 circular_pitch = (gear_distance * 180 * 2) / (teeth_small + teeth_big);
 echo (circular_pitch);
+
+bolt_head = 13;
+bolt_dia = 8;
 
 module small(){
     difference() {
@@ -98,7 +101,7 @@ module big(){
         translate([0, 0, 3 - gear_width / 2]) rotate([0, 0, 90]) 
 				cylinder(r1=24, r2=28, h=gear_width - layer_height * 9 + 1, $fn=36);
         //bore
-        translate([0, 0, -gear_width / 2 - 0.1]) cylinder(r=m8_diameter / 2, h=gear_width + 9.2);
+        translate([0, 0, -gear_width / 2 - 0.1]) cylinder(r=bolt_dia / 2, h=gear_width + 9.2);
         for (hole=[0:5]) {
             rotate([0, 0, 360 / 6 * hole + 30]) translate([17,0,-10]) rotate(12) {
                 cylinder(r=hole_size, h=20);
@@ -109,9 +112,9 @@ module big(){
     }
     //threaded bolt trap
     difference(){
-        translate([0, 0, -gear_width / 2]) cylinder(r=10, h=7 + layer_height * 9);
-        translate([0, 0, -gear_width / 2 + layer_height * 6 + 2]) nut(13.1, h=10);
-        translate([0, 0, -gear_width / 2 - 0.1]) cylinder(r=m8_diameter / 2, h=gear_width + 9.2);
+        translate([0, 0, -gear_width / 2]) cylinder(r=bolt_head / 2 + 5.55, h=gear_width, $fn=6);
+        translate([0, 0, -gear_width / 2 + layer_height * 6 + 2]) nut(bolt_head, h=10);
+        translate([0, 0, -gear_width / 2 - 0.1]) cylinder(r=bolt_dia / 2, h=gear_width + 9.2);
     }
 
 }

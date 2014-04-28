@@ -17,3 +17,5 @@ Aim for 0.3mm layers and 2.2 extrusion width (width over thickness), for 0.66mm 
 If you print bushing.stl/y-carriage.stl in PLA it may deform due to heatbed being close, and printed groovemount is in danger too.
 
 Using doc/complete-printer-plus.scad as a visual clue and doc/manual.txt as a guide, build the printer.
+
+If you are unsure which rods to use: The Y frame is made of M8 and M10 threaded rods, lengths are in doc/dimensions.md. Smooth rods depend on your config, for thickness check in README.md for your variant and doc/dimensions.md for lenghts. 
